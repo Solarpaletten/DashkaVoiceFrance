@@ -20,9 +20,13 @@ const useDeviceType = () => {
   return device;
 };
 
-const device = useDeviceType();
-
 const DualTranslator: React.FC = () => {
+
+  const device = useDeviceType();
+  const isMobile = device === 'mobile';
+  const isTablet = device === 'tablet';
+  const isDesktop = device === 'desktop';
+
   const {
     originalText,
     translatedText,
@@ -118,13 +122,14 @@ const DualTranslator: React.FC = () => {
     }
   };
 
-  // --- Layout info ---
-  const isMobile = device === 'mobile';
-  const isTablet = device === 'tablet';
-  const isDesktop = device === 'desktop';
-
   return (
     <div className="w-full h-screen flex flex-col bg-gradient-to-br from-purple-600 via-blue-600 to-teal-600">
+
+      <div className="text-center text-white/60 text-xs mt-2">
+        {isMobile && "📱 Mobile version"}
+        {isTablet && "💻 Tablet version"}
+        {isDesktop && "🖥️ Desktop version"}
+      </div>
 
       <header className="flex justify-between items-center p-6">
         <h1 className="text-white text-3xl font-bold">🎤 Dual Translator</h1>
@@ -152,12 +157,6 @@ const DualTranslator: React.FC = () => {
           <span>{status}</span>
           <span className="ml-3 text-sm opacity-70">(Enter = смена языка | Space = старт/стоп)</span>
         </div>
-      </div>
-
-      <div className="text-center text-white/60 text-xs mt-2">
-        {isMobile && "📱 Mobile version"}
-        {isTablet && "💻 Tablet version"}
-        {isDesktop && "🖥️ Desktop version"}
       </div>
 
       <main className="flex-1 flex gap-4 px-6 pb-6">
