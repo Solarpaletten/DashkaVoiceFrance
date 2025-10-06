@@ -1,6 +1,27 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslator } from '../../hooks/useTranslator';
 
+const useDeviceType = () => {
+  const [device, setDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
+
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      if (width < 700) setDevice('mobile');
+      else if (width < 900) setDevice('tablet');
+      else setDevice('desktop');
+    };
+
+    handleResize(); // Первичная проверка
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return device;
+};
+
+const device = useDeviceType();
+
 const DualTranslator: React.FC = () => {
   const {
     originalText,
@@ -16,7 +37,7 @@ const DualTranslator: React.FC = () => {
   const dialects = ['fr-FR', 'fr-CH', 'ru-RU'];
   const dialectNames = {
     'fr-FR': '🇫🇷 France',
-    'fr-CH': '🇨🇭 Suisse', 
+    'fr-CH': '🇨🇭 Suisse',
     'ru-RU': '🇷🇺 Русский'
   };
 
@@ -42,7 +63,7 @@ const DualTranslator: React.FC = () => {
         setDialectIndex(nextIndex);
         const newDialect = dialects[nextIndex];
         setDialect(newDialect);
-        setRecognitionLang(newDialect); 
+        setRecognitionLang(newDialect);
       } else if (e.code === 'Space') {
         e.preventDefault();
         toggleRecording();
@@ -97,6 +118,11 @@ const DualTranslator: React.FC = () => {
     }
   };
 
+  // --- Layout info ---
+  const isMobile = device === 'mobile';
+  const isTablet = device === 'tablet';
+  const isDesktop = device === 'desktop';
+
   return (
     <div className="w-full h-screen flex flex-col bg-gradient-to-br from-purple-600 via-blue-600 to-teal-600">
 
@@ -109,9 +135,8 @@ const DualTranslator: React.FC = () => {
 
         <button
           onClick={toggleRecording}
-          className={`px-8 py-4 rounded-xl font-semibold text-white text-lg shadow-lg transition-all ${
-            isRecording ? 'bg-red-600 hover:bg-red-700 animate-pulse' : 'bg-green-600 hover:bg-green-700'
-          }`}
+          className={`px-8 py-4 rounded-xl font-semibold text-white text-lg shadow-lg transition-all ${isRecording ? 'bg-red-600 hover:bg-red-700 animate-pulse' : 'bg-green-600 hover:bg-green-700'
+            }`}
         >
           {isRecording ? '⏹️ Остановить' : '▶️ Запустить'}
         </button>
@@ -127,6 +152,12 @@ const DualTranslator: React.FC = () => {
           <span>{status}</span>
           <span className="ml-3 text-sm opacity-70">(Enter = смена языка | Space = старт/стоп)</span>
         </div>
+      </div>
+
+      <div className="text-center text-white/60 text-xs mt-2">
+        {isMobile && "📱 Mobile version"}
+        {isTablet && "💻 Tablet version"}
+        {isDesktop && "🖥️ Desktop version"}
       </div>
 
       <main className="flex-1 flex gap-4 px-6 pb-6">
